@@ -17,4 +17,11 @@ public class Product {
     private Long id;
     private Integer restock;
     private Integer count;
+
+    public void updateCount(Integer count) {
+        this.count = count;
+    }
+    public void plusRestock() {
+        restock++;
+    }
 }
