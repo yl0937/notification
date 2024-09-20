@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "ProductUserNotificationHistory")
+@Entity
 public class ProductUserNotificationHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +21,13 @@ public class ProductUserNotificationHistory {
     private Long userId;
     private Integer restock;
     private LocalDateTime sendAt;
+
+    public static ProductUserNotificationHistory from (Long productId, Long userId, Integer restock) {
+        return ProductUserNotificationHistory.builder()
+                .productId(productId)
+                .userId(userId)
+                .restock(restock)
+                .sendAt(LocalDateTime.now())
+                .build();
+    }
 }
