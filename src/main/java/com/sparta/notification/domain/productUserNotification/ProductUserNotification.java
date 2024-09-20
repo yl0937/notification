@@ -22,4 +22,14 @@ public class ProductUserNotification {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public static ProductUserNotification from(Long productId, Long userId) {
+        return ProductUserNotification.builder()
+                .productId(productId)
+                .userId(userId)
+                .status("activate")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
 }
