@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductNotificationHistoryRepository extends JpaRepository<ProductNotificationHistory, Long> {
+    ProductNotificationHistory findByProductId(Long productId);
 }
