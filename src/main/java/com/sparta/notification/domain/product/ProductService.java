@@ -45,12 +45,14 @@ public class ProductService {
         ProductNotificationHistory notificationHistory = notificationHistoryRepository.save(
                 ProductNotificationHistory.from(productId,users.get(0).getUserId(),"IN_PROGRESS"));
 
+        boolean completed = true;
         for (ProductUserNotification user : users) {
             if(product.getCount() <= 0 ) {
                 // 품절에 의한 발송 중단
                 notificationHistory.updateStatus("CANCELED_BY_SOLD_OUT");
                 notificationHistory.updateUserId(user.getUserId());
                 notificationHistoryRepository.save(notificationHistory);
+                completed = false;
                 break;
             }
 
@@ -59,7 +61,6 @@ public class ProductService {
             if (success) {
                 // 재고 감소
                 product.minusCount();
-                productRepository.save(product);
 
                 // 초당 요청 수 제한
                 rateLimiter.acquire();
@@ -72,13 +73,18 @@ public class ProductService {
                 notificationHistory.updateStatus("CANCELED_BY_ERROR");
                 notificationHistory.updateUserId(user.getUserId());
                 notificationHistoryRepository.save(notificationHistory);
+                completed = false;
                 break;
             }
 
-            //완료
+        }
+
+        // 재고 반영
+        productRepository.save(product);
+
+        if (completed) {
             notificationHistory.updateStatus("COMPLETED");
             notificationHistoryRepository.save(notificationHistory);
-
         }
 
     }
