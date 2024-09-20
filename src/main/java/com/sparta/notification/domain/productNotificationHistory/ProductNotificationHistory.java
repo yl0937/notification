@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "ProductUserNotificationHistory")
+@Entity(name = "ProductNotificationHistory")
 public class ProductNotificationHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
