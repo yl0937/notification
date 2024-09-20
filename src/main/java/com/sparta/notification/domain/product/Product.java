@@ -24,4 +24,7 @@ public class Product {
     public void plusRestock() {
         restock++;
     }
+    public void minusCount() {
+        count--;
+    }
 }
