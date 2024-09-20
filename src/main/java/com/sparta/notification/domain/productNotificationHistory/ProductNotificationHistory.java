@@ -1,6 +1,5 @@
 package com.sparta.notification.domain.productNotificationHistory;
 
-import com.sparta.notification.domain.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
