@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,19 +29,7 @@ public class ProductService {
 
     private final RateLimiter rateLimiter = RateLimiter.create(500.0);
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void productRestock(Long productId, Integer count) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(()-> new BaseException(ErrorCode.WRONG_PRODUCT));
-
-        // 재고 반영 및 재입고 회차 증가
-        product.updateCount(count);
-        product.plusRestock();
-        productRepository.save(product);
-
-        // 알림 유저 리스트 조회
-        List<ProductUserNotification> users = userNotificationRepository.findByProductIdOrderByIdAsc(productId);
-
+    public void sendNotification(Product product, Long productId, List<ProductUserNotification> users){
         // 재입고 알림 전송 상태 생성 (발송중)
         ProductNotificationHistory notificationHistory = notificationHistoryRepository.save(
                 ProductNotificationHistory.from(productId,users.get(0).getUserId(),"IN_PROGRESS"));
@@ -86,6 +75,41 @@ public class ProductService {
             notificationHistory.updateStatus("COMPLETED");
             notificationHistoryRepository.save(notificationHistory);
         }
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void productRestock(Long productId, Integer count) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(()-> new BaseException(ErrorCode.WRONG_PRODUCT));
+
+        // 재고 반영 및 재입고 회차 증가
+        product.updateCount(count);
+        product.plusRestock();
+        productRepository.save(product);
+
+        // 알림 유저 리스트 조회
+        List<ProductUserNotification> users = userNotificationRepository.findByProductIdOrderByIdAsc(productId);
+
+        // 알림 전송
+        sendNotification(product,productId,users);
+
+    }
+
+    public void manualRestock(Long productId) {
+        // 전송해야 할 유저가 알림 설정한 시간 저장
+        ProductNotificationHistory notificationHistory = notificationHistoryRepository.findByProductId(productId);
+        Long userId = notificationHistory.getUserId();
+        LocalDateTime time = userNotificationRepository.findByProductIdAndUserId(productId,userId).getCreatedAt();
+
+        // 저장된 시간 이후의 데이터만 가져오기
+        List<ProductUserNotification> users =
+                userNotificationRepository.findByProductIdOrderByIdAscAfter(productId,time);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(()-> new BaseException(ErrorCode.WRONG_PRODUCT));
+
+        // 알림 전송
+        sendNotification(product,productId,users);
 
     }
 
