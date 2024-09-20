@@ -6,8 +6,14 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     public boolean send(Long userId) {
-        System.out.println("Sending notification to : " + userId);
-        return true;
+        try {
+            System.out.println("Sending notification to : " + userId);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Failed to send notification to : " + userId);
+            return false;
+        }
+
     }
 
 }
