@@ -12,13 +12,13 @@ public class notificationController {
     private final ProductService productService;
 
     @PostMapping("/products/{productId}/notifications/re-stock")
-    SuccessResponse<?> sendNotification(@RequestParam Long productId, @RequestBody Integer count) {
+    public SuccessResponse<?> sendNotification(@RequestParam Long productId, @RequestBody Integer count) {
         productService.productRestock(productId,count);
         return ResponseUtil.success();
     }
 
     @PostMapping("/admin/products/{productId}/notifications/re-stock")
-    SuccessResponse<?> resendNotification(@RequestParam Long productId) {
+    public SuccessResponse<?> resendNotification(@RequestParam Long productId) {
         productService.manualRestock(productId);
         return ResponseUtil.success();
     }
